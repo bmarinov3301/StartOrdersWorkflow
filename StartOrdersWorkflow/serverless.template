@@ -1,0 +1,96 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": "An AWS Serverless Application. This template is partially managed by Amazon.Lambda.Annotations (v1.0.0.0).",
+  "Resources": {
+    "ApproveOrderLambda": {
+      "Type": "AWS::Serverless::Function",
+      "Metadata": {
+        "Tool": "Amazon.Lambda.Annotations",
+        "SyncedEvents": [
+          "RootGet"
+        ]
+      },
+      "Properties": {
+        "Runtime": "dotnet6",
+        "CodeUri": ".",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Role": "aws-iam-role-arn-here",
+        "PackageType": "Zip",
+        "Handler": "StartOrdersWorkflow::StartOrdersWorkflow.StartOrders_ApproveOrder_Generated::ApproveOrder",
+        "Events": {
+          "RootGet": {
+            "Type": "HttpApi",
+            "Properties": {
+              "Path": "/orders/approve/{orderId}",
+              "Method": "GET"
+            }
+          }
+        }
+      }
+    },
+    "RejectOrderLambda": {
+      "Type": "AWS::Serverless::Function",
+      "Metadata": {
+        "Tool": "Amazon.Lambda.Annotations",
+        "SyncedEvents": [
+          "RootGet"
+        ]
+      },
+      "Properties": {
+        "Runtime": "dotnet6",
+        "CodeUri": ".",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Role": "aws-iam-role-arn-here",
+        "PackageType": "Zip",
+        "Handler": "StartOrdersWorkflow::StartOrdersWorkflow.StartOrders_RejectOrder_Generated::RejectOrder",
+        "Events": {
+          "RootGet": {
+            "Type": "HttpApi",
+            "Properties": {
+              "Path": "/orders/reject/{orderId}",
+              "Method": "GET"
+            }
+          }
+        }
+      }
+    },
+    "StartWorkflowLambda": {
+      "Type": "AWS::Serverless::Function",
+      "Metadata": {
+        "Tool": "Amazon.Lambda.Annotations",
+        "SyncedEvents": [
+          "RootPost"
+        ]
+      },
+      "Properties": {
+        "Runtime": "dotnet6",
+        "CodeUri": ".",
+        "MemorySize": 128,
+        "Timeout": 15,
+        "Role": "aws-iam-role-arn-here",
+        "PackageType": "Zip",
+        "Handler": "StartOrdersWorkflow::StartOrdersWorkflow.StartOrders_StartWorkflow_Generated::StartWorkflow",
+        "Events": {
+          "RootPost": {
+            "Type": "HttpApi",
+            "Properties": {
+              "Path": "/start",
+              "Method": "POST"
+            }
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ApiURL": {
+      "Description": "API endpoint URL for Prod environment",
+      "Value": {
+        "Fn::Sub": "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+      }
+    }
+  }
+}
